@@ -25,7 +25,7 @@ class SimpleGSMDecoder(gr.top_block):
         self.source.set_gain_mode(False)
         self.source.set_gain(30)
         self.source.set_if_gain(30)
-        self.source.set_bb_gain(20)
+        self.source.set_bb_gain(40)
         self.source.set_antenna("", 0)
         self.source.set_bandwidth(0, 0)
 
