@@ -31,6 +31,13 @@ class ControlWidget(Qt.QWidget):
         self.device1_bb_gain.returnPressed.connect(self.update_device1_bb_gain)
         self.layout.addWidget(self.device1_bb_gain)
 
+        # Lisää taajuussäädin Device 1:lle
+        self.layout.addWidget(Qt.QLabel("Device 1 Frequency (Hz):"))
+        self.device1_freq = Qt.QLineEdit(str(self.decoder.source1.get_center_freq()))
+        self.device1_freq.setPlaceholderText("Enter frequency in Hz")
+        self.device1_freq.returnPressed.connect(self.update_device1_freq)
+        self.layout.addWidget(self.device1_freq)
+
         self.layout.addWidget(Qt.QLabel("Device 2 Controls"))
         self.layout.addWidget(Qt.QLabel("RF Gain (0 or 11):"))
         self.device2_rf_gain = Qt.QLineEdit(str(self.decoder.source2.get_gain("AMP")))
@@ -49,6 +56,13 @@ class ControlWidget(Qt.QWidget):
         self.device2_bb_gain.setPlaceholderText("Baseband Gain (0-62, step 2)")
         self.device2_bb_gain.returnPressed.connect(self.update_device2_bb_gain)
         self.layout.addWidget(self.device2_bb_gain)
+
+        # Lisää taajuussäädin Device 2:lle
+        self.layout.addWidget(Qt.QLabel("Device 2 Frequency (Hz):"))
+        self.device2_freq = Qt.QLineEdit(str(self.decoder.source2.get_center_freq()))
+        self.device2_freq.setPlaceholderText("Enter frequency in Hz")
+        self.device2_freq.returnPressed.connect(self.update_device2_freq)
+        self.layout.addWidget(self.device2_freq)
 
         # Luo scroll area
         scroll_area = Qt.QScrollArea()
@@ -131,3 +145,26 @@ class ControlWidget(Qt.QWidget):
                 print("Invalid Baseband Gain for Device 2 (must be 0-62 in steps of 2)")
         except ValueError:
             print("Invalid Baseband Gain input for Device 2")
+
+    # Päivitysmetodit taajuudelle
+    def update_device1_freq(self):
+        try:
+            freq = float(self.device1_freq.text())
+            if freq > 0:
+                self.decoder.source1.set_center_freq(freq)
+                print(f"Device 1 Frequency set to: {freq} Hz")
+            else:
+                print("Invalid frequency for Device 1 (must be positive)")
+        except ValueError:
+            print("Invalid frequency input for Device 1")
+
+    def update_device2_freq(self):
+        try:
+            freq = float(self.device2_freq.text())
+            if freq > 0:
+                self.decoder.source2.set_center_freq(freq)
+                print(f"Device 2 Frequency set to: {freq} Hz")
+            else:
+                print("Invalid frequency for Device 2 (must be positive)")
+        except ValueError:
+            print("Invalid frequency input for Device 2")
