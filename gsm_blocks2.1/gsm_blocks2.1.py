@@ -27,6 +27,7 @@ import sip
 from gnuradio.filter import window
 import sys
 from controls.controls import ControlWidget  # Import ControlWidget
+from PyQt5.QtWidgets import QScrollArea  # Lisää tämä import
 
 
 class SimpleGSMDecoder(gr.top_block):
@@ -87,7 +88,7 @@ class SimpleGSMDecoder(gr.top_block):
         self.qtgui_freq_sink1.enable_grid(False)
         self.qtgui_freq_sink1.set_fft_average(1.0)
         self.qtgui_freq_sink1.enable_axis_labels(True)
-        self.qtgui_freq_sink1.enable_control_panel(False)
+        self.qtgui_freq_sink1.enable_control_panel(True)
 
         # Frequency sink for source 2
         self.qtgui_freq_sink2 = qtgui.freq_sink_c(
@@ -105,7 +106,7 @@ class SimpleGSMDecoder(gr.top_block):
         self.qtgui_freq_sink2.enable_grid(False)
         self.qtgui_freq_sink2.set_fft_average(1.0)
         self.qtgui_freq_sink2.enable_axis_labels(True)
-        self.qtgui_freq_sink2.enable_control_panel(False)
+        self.qtgui_freq_sink2.enable_control_panel(True)
 
         # GSM input adaptori
         self.gsm_input = gsm.gsm_input(
@@ -146,18 +147,33 @@ class SimpleGSMDecoder(gr.top_block):
         self.sink = blocks.message_debug()
         self.msg_connect((self.control_channels_decoder, 'msgs'), (self.sink, 'print'))
 
-        # Create a top-level Qt widget and add the Qt GUI sink
+        # Luo pääikkuna
         self.qtgui_window = Qt.QWidget()
-        main_layout = Qt.QVBoxLayout(self.qtgui_window)
 
-        # Add frequency sinks
+        # Luo scroll area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        # Luo widgetti, joka sisältää kaikki elementit
+        container_widget = Qt.QWidget()
+        main_layout = Qt.QVBoxLayout(container_widget)
+
+        # Lisää frequency sinks
         main_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink1.qwidget(), Qt.QWidget))
         main_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink2.qwidget(), Qt.QWidget))
 
-        # Add control widget
+        # Lisää control widget
         self.control_widget = ControlWidget(self)
         main_layout.addWidget(self.control_widget)
 
+        # Aseta container_widget scroll area -widgettiin
+        scroll_area.setWidget(container_widget)
+
+        # Lisää scroll area pääikkunaan
+        window_layout = Qt.QVBoxLayout(self.qtgui_window)
+        window_layout.addWidget(scroll_area)
+
+        # Näytä ikkuna
         self.qtgui_window.show()
 
 
