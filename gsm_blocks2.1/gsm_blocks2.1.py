@@ -26,15 +26,16 @@ from PyQt5 import Qt
 import sip
 from gnuradio.filter import window
 import sys
+from controls.controls import ControlWidget  # Import ControlWidget
 
 
 class SimpleGSMDecoder(gr.top_block):
     def __init__(self):
         gr.top_block.__init__(self)
 
-        #Samp rate ja frequency class attributeina
-        self.samp_rate = 4e6 #Jos samp rate yksi ei näy mitään
-        self.center_freq = 952.756e6
+        # Samp rate ja frequency class attributeina
+        self.samp_rate = 4e6  # Jos samp rate yksi ei näy mitään
+        self.center_freq = 900.756e6
 
         # Printataan käytettävä taajuus
         print(f"Käytettävä taajuus: {self.center_freq / 1e6} MHz")
@@ -72,12 +73,12 @@ class SimpleGSMDecoder(gr.top_block):
 
         # Frequency sink for source 1
         self.qtgui_freq_sink1 = qtgui.freq_sink_c(
-            1024, # size
-            window.WIN_BLACKMAN_hARRIS, # wintype
-            self.center_freq, # fc
-            self.samp_rate, # bw
-            "Source 1 Spectrum", # name
-            1 # number of inputs
+            1024,  # size
+            window.WIN_BLACKMAN_hARRIS,  # wintype
+            self.center_freq,  # fc
+            self.samp_rate,  # bw
+            "Source 1 Spectrum",  # name
+            1  # number of inputs
         )
         self.qtgui_freq_sink1.set_update_time(0.10)
         self.qtgui_freq_sink1.set_y_axis(-140, 10)
@@ -90,12 +91,12 @@ class SimpleGSMDecoder(gr.top_block):
 
         # Frequency sink for source 2
         self.qtgui_freq_sink2 = qtgui.freq_sink_c(
-            1024, # size
-            window.WIN_BLACKMAN_hARRIS, # wintype
-            self.center_freq, # fc
-            self.samp_rate, # bw
-            "Source 2 Spectrum", # name
-            1 # number of inputs
+            1024,  # size
+            window.WIN_BLACKMAN_hARRIS,  # wintype
+            self.center_freq,  # fc
+            self.samp_rate,  # bw
+            "Source 2 Spectrum",  # name
+            1  # number of inputs
         )
         self.qtgui_freq_sink2.set_update_time(0.10)
         self.qtgui_freq_sink2.set_y_axis(-140, 10)
@@ -108,10 +109,10 @@ class SimpleGSMDecoder(gr.top_block):
 
         # GSM input adaptori
         self.gsm_input = gsm.gsm_input(
-            ppm =0,
-            osr =4,
-            fc = self.center_freq,
-            samp_rate_in = self.samp_rate,
+            ppm=0,
+            osr=4,
+            fc=self.center_freq,
+            samp_rate_in=self.samp_rate,
         )
 
         # GSM receiver palikka
@@ -147,16 +148,23 @@ class SimpleGSMDecoder(gr.top_block):
 
         # Create a top-level Qt widget and add the Qt GUI sink
         self.qtgui_window = Qt.QWidget()
-        self.qtgui_layout = Qt.QVBoxLayout(self.qtgui_window)
-        self.qtgui_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink1.qwidget(), Qt.QWidget))
-        self.qtgui_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink2.qwidget(), Qt.QWidget))
+        main_layout = Qt.QVBoxLayout(self.qtgui_window)
+
+        # Add frequency sinks
+        main_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink1.qwidget(), Qt.QWidget))
+        main_layout.addWidget(sip.wrapinstance(self.qtgui_freq_sink2.qwidget(), Qt.QWidget))
+
+        # Add control widget
+        self.control_widget = ControlWidget(self)
+        main_layout.addWidget(self.control_widget)
+
         self.qtgui_window.show()
+
 
 if __name__ == '__main__':
     qapp = Qt.QApplication(sys.argv)
     tb = SimpleGSMDecoder()
     tb.start()
-    tb.qtgui_window.show()
     qapp.exec_()
     tb.stop()
     tb.wait()
