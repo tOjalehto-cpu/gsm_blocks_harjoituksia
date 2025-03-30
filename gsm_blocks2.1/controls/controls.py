@@ -152,6 +152,7 @@ class ControlWidget(Qt.QWidget):
             freq = float(self.device1_freq.text())
             if freq > 0:
                 self.decoder.source1.set_center_freq(freq)
+                self.decoder.qtgui_freq_sink1.set_center_freq(freq)  # Päivitä freq_sink1:n keskitaajuus
                 print(f"Device 1 Frequency set to: {freq} Hz")
             else:
                 print("Invalid frequency for Device 1 (must be positive)")
@@ -163,6 +164,7 @@ class ControlWidget(Qt.QWidget):
             freq = float(self.device2_freq.text())
             if freq > 0:
                 self.decoder.source2.set_center_freq(freq)
+                self.decoder.qtgui_freq_sink2.set_center_freq(freq)  # Päivitä freq_sink2:n keskitaajuus
                 print(f"Device 2 Frequency set to: {freq} Hz")
             else:
                 print("Invalid frequency for Device 2 (must be positive)")
